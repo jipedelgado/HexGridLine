@@ -1,0 +1,23 @@
+REGLES DU JEU
+
+Le jeu se joue sur un plateau hexagonal composé de cases hexagonales de couleur jaune.
+Certaines cases sont de 8 couleurs différentes.
+
+le principe est le suivant:
+
+Un click droit sur une case recherche toutes les lignes contenant cette case, de longueur supérieure à une certaine valeur. 
+Les cases de ces lignes sont coloriées en jaune.
+Puis un certain nombre de cases jaunes, tirées au hasard sont coloriées aléatoirement, parmi les 8 couleurs possibles.
+
+un click gauche de la souris sélectionne une case.
+Si la case est jaune, rien ne se passe.
+Si elle est d'une autre couleur, cette case est mémorisée.
+Au click gauche suivant, si la case est jaune, le plus court chemin entre les deux cases est dessiné en vert.
+Le click droit sur cette case efface le plus court chemin, rend jaune la première case, et donne à la deuxième case la couleur de la premiere.
+
+Sont paramétrables :
+La taille du plateau, c'est à dire le nombre de cases du côté du plateau hexagonal,
+La longueur minimale de la ligne déclenchant son effacement
+Le nombre de cases colorées au lancement du jeu
+Le nombre de pions supplémentaires à chaque clic droit
+

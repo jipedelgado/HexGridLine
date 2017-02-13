@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using Hex = HexGridLib.Hex;
 
-public class GameController : MonoBehaviour {
+public class GameControllerScript : MonoBehaviour {
     public GameObject tile;
     public int size = 5;
     public int initialNbPawns = 5;
@@ -23,9 +23,21 @@ public class GameController : MonoBehaviour {
     private List<Hex> Fronter;
     private List<List<Hex>> ListeDeLignes;
     private List<Hex> Pions;
+    private int score;
 
     void Start() {
-        
+
+        //  récupération des valeurs de la scène Menu"
+        size = (int)Mathf.Round(UIControllerScript.size);
+        initialNbPawns = (int)Mathf.Round(UIControllerScript.initialNbPawns);
+        longueurChaine = (int)Mathf.Round(UIControllerScript.longueurChaine);
+        NbPionsAjoutés = (int)Mathf.Round(UIControllerScript.NbPionsAjoutés);
+
+        // Positionnement et mise à l'échelle de la camera
+        Camera camera = GameObject.Find("Main Camera").transform.GetComponent<Camera>();
+        camera.transform.position = new Vector3(0, 30, 0);
+        camera.orthographicSize = 2 * size;
+
         // initialisation des privates
         plateau = new List<Hex>();
         pile = new Stack<Hex>();
@@ -39,8 +51,8 @@ public class GameController : MonoBehaviour {
 
         // Affectations
         Colors = new List<Color> { Color.cyan, Color.blue, Color.gray, Color.black, Color.white, Color.magenta, Color.red, Color.grey };
-        plateau = Hex.Spiral(centre, size - 1);
-        Fronter = Hex.Ring(centre, size);
+        plateau = Hex.Spiral(centre, size);
+        Fronter = Hex.Ring(centre, size + 1);
         foreach (Hex h in Fronter) {
             Obstacles.Add(h);
         }
@@ -61,6 +73,13 @@ public class GameController : MonoBehaviour {
             Hex HexTempo = getHexWithMouse();
             if (plateau.Contains(HexTempo)) {
                 pile.Push(HexTempo);
+                Text ZoneAffichage = GameObject.Find("Affichage").GetComponent<Text>();
+                ZoneAffichage.text = "";
+
+            }
+            else {
+                Text ZoneAffichage = GameObject.Find("Affichage").GetComponent<Text>();
+                ZoneAffichage.text = "Click en dehors du tableau !!";
             }
         }
 
@@ -86,10 +105,13 @@ public class GameController : MonoBehaviour {
             // on recherche les lignes conformes, cad plus longue que "longueurChaine
             Hex HexTempo = getHexWithMouse();
             if (plateau.Contains(HexTempo)) {
+                Text ZoneAffichage = GameObject.Find("Affichage").GetComponent<Text>();
+                ZoneAffichage.text = "";
                 ListeDeLignes = SearchLine(HexTempo, longueurChaine);
             }
             else {
-                Debug.Log("Click en dehors du tableau !!");
+                Text ZoneAffichage = GameObject.Find("Affichage").GetComponent<Text>();
+                ZoneAffichage.text = "Click en dehors du tableau !!";
             }
 
             // puis on les traite
@@ -99,6 +121,7 @@ public class GameController : MonoBehaviour {
                 foreach (List<Hex> ligne in ListeDeLignes) {
                     SetColor(ligne, Color.yellow);
                     foreach (Hex hex in ligne) {
+                        score++;
                         if (Obstacles.Contains(hex)) {
                             Obstacles.Remove(hex);
                         }
@@ -108,16 +131,25 @@ public class GameController : MonoBehaviour {
                     }
                 }
             }
-            // sinon, on rajoute des pions, si c'est possible. Sinon, arret du jeu
+            // sinon, on rajoute des pions, si c'est possible. 
+            // sinon, affichage d'un message
             else {
                 if (Pions.Count <= plateau.Count - NbPionsAjoutés) {
                     DisplayHex(NbPionsAjoutés);
                 }
                 else {
-                    Debug.Log("plus de coup possible");
+                    Text ZoneAffichage = GameObject.Find("Affichage").GetComponent<Text>();
+                    ZoneAffichage.text = "plus de coup possible";
                 }
             }
         }
+
+        // affichage du score
+        if (score > 0) {
+            Text AffichageScore = GameObject.Find("AffichageScore").GetComponent<Text>();
+            AffichageScore.text = "Score = " + score.ToString();
+        }
+
 
         // si la pile contient deux éléments, on la vide puis on dessine le plus court chemin, en vert
         if (pile.Count > 1) {
@@ -176,6 +208,7 @@ public class GameController : MonoBehaviour {
         return lignesOK;
     }
 
+    // pour debug
     private void Print( List<Hex> liste ) {
         string s = " List<Hex> ";
         foreach (Hex h in liste) {
@@ -245,6 +278,18 @@ public class GameController : MonoBehaviour {
                 SetColor(hex, color);
             }
         }
+    }
+
+    public void Quitter() {
+        Application.Quit();
+    }
+
+    public void NouveauJeu() {
+        SceneManager.LoadScene("Menu");
+    }
+
+    public void Recommencer() {
+        SceneManager.LoadScene("Main");
     }
 }
 
